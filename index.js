@@ -1,11 +1,51 @@
 import * as THREE from 'three';
+
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import * as dat from 'three/examples/jsm/libs/dat.gui.module.js'
-import { Line2 } from 'three/examples/jsm/lines/Line2.js';
-import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
-import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry.js';
-import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
+
+import 'three/examples/jsm/lines/LineSegmentsGeometry.js';
+import {LineGeometry} from 'three/examples/jsm/lines/LineGeometry.js';
+import 'three/examples/jsm/lines/WireframeGeometry2.js';
+
+import 'three/examples/jsm/lines/LineMaterial.js';
+import 'three/examples/jsm/lines/LineSegments2.js';
+import {Line2} from 'three/examples/jsm/lines/Line2.js';
+
+
+function cube(size) {
+
+    var h = size * 0.5;
+    var position = [];
+    // NOTE 3 + 4: Return the position array directly so it can be 
+    // passed into the LineGeometry directy and create a cube out
+    // of a single path.
+    position.push(
+        - h, - h, - h,
+        - h, h, - h,
+        h, h, - h,
+        h, - h, - h,
+        - h, - h, - h,
+
+        - h, - h, h,
+        - h, h, h,
+        - h, h, - h,
+        - h, h, h,
+
+        h, h, h,
+        h, h, - h,
+        h, h, h,
+
+        h, - h, h,
+        h, - h, - h,
+        h, - h, h,
+        - h, - h, h,
+
+    );
+
+    return position;
+
+}
 
 
 
@@ -21,15 +61,19 @@ const scene = new THREE.Scene()
 // Objects
 const geometry = new THREE.BoxGeometry();
 
-console.log({LineGeometry})
-var geometry1 = new THREE.LineGeometry();
+// console.log({ LineGeometry })
+var geometry1 = new LineGeometry();
 geometry1.setPositions(cube(1));
 
 
 // Materials
 
-const material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+const material = new THREE.MeshLambertMaterial({ color: 0xffffff });
 var materialsArray = getMaterialsArray()
+
+// NOTE 3: Create a Line2 Object
+const wireframe = new Line2(geometry1, material);
+scene.add(wireframe);
 
 // Mesh Groups
 var groupsMesh = new Array()
@@ -48,7 +92,6 @@ var firstGroup = createGeometryBlock(centerX, centerY, centerZ, amountX, amountY
 scene.add(firstGroup)
 
 
-                                    
 // Lights
 
 const pointLight = new THREE.PointLight(0xffffff, 1)
@@ -70,9 +113,9 @@ const lightColor = {
 }
 
 light1.addColor(lightColor, 'color')
-.onChange(() => {
-    pointLight.color.set(lightColor.color)
-})
+    .onChange(() => {
+        pointLight.color.set(lightColor.color)
+    })
 
 
 const pointLight2 = new THREE.PointLight(0xffffff, 1.8)
@@ -99,8 +142,7 @@ const sizes = {
     height: window.innerHeight
 }
 
-window.addEventListener('resize', () =>
-{
+window.addEventListener('resize', () => {
     // Update sizes
     sizes.width = window.innerWidth
     sizes.height = window.innerHeight
@@ -164,8 +206,7 @@ document.body.appendChild(stats.dom);
 
 const clock = new THREE.Clock()
 
-const tick = () =>
-{
+const tick = () => {
 
     const elapsedTime = clock.getElapsedTime()
 
@@ -193,11 +234,11 @@ const tick = () =>
     window.requestAnimationFrame(tick)
 }
 
-function randomNumber(min, max){
-    return Math.floor(Math.random()*(max - min + 1) + min)
+function randomNumber(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
-function createGeometryBlock(centerX, centerY, centerZ, amountX, amountY, amountZ , separation) {
+function createGeometryBlock(centerX, centerY, centerZ, amountX, amountY, amountZ, separation) {
     var gridArray = new Array(amountX)
 
     const group = new THREE.Group();
@@ -207,13 +248,13 @@ function createGeometryBlock(centerX, centerY, centerZ, amountX, amountY, amount
         for (let iz = 0; iz < amountZ; iz++) {
             gridArray[ix][iz] = new Array(amountY)
             for (let iy = 0; iy < amountY; iy++) {
-                if (randomNumber(0,1) == 1) {
-                    gridArray[ix][iz][iy] = new THREE.Mesh( geometry, material )
+                if (randomNumber(0, 1) == 1) {
+                    gridArray[ix][iz][iy] = new THREE.Mesh(geometry, material)
                     gridArray[ix][iz][iy].position.x = ix * separation - (amountX * separation) / 2
                     gridArray[ix][iz][iy].position.z = iz * separation - (amountZ * separation) / 2
                     gridArray[ix][iz][iy].position.y = iy * separation - (amountY * separation) / 2
                     group.add(gridArray[ix][iz][iy])
-                } else{
+                } else {
                     gridArray[ix][iz][iy] = null
                 }
             }
@@ -222,14 +263,14 @@ function createGeometryBlock(centerX, centerY, centerZ, amountX, amountY, amount
     return group
 }
 
-function getMaterialsArray(){
+function getMaterialsArray() {
     var matarialsArray = new Array()
-    matarialsArray.push(new THREE.MeshLambertMaterial( { color: 0x143D86 } ))
-    matarialsArray.push(new THREE.MeshLambertMaterial( { color: 0x036D19 } ))
-    matarialsArray.push(new THREE.MeshLambertMaterial( { color: 0xA52422 } ))
-    matarialsArray.push(new THREE.MeshLambertMaterial( { color: 0xE0CA3C } ))
-    matarialsArray.push(new THREE.MeshLambertMaterial( { color: 0xDC136C } ))
-    matarialsArray.push(new THREE.MeshLambertMaterial( { color: 0xffffff } ))
+    matarialsArray.push(new THREE.MeshLambertMaterial({ color: 0x143D86 }))
+    matarialsArray.push(new THREE.MeshLambertMaterial({ color: 0x036D19 }))
+    matarialsArray.push(new THREE.MeshLambertMaterial({ color: 0xA52422 }))
+    matarialsArray.push(new THREE.MeshLambertMaterial({ color: 0xE0CA3C }))
+    matarialsArray.push(new THREE.MeshLambertMaterial({ color: 0xDC136C }))
+    matarialsArray.push(new THREE.MeshLambertMaterial({ color: 0xffffff }))
 
     return matarialsArray
 }
